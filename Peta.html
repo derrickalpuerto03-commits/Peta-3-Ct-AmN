@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>peta 2</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+  body{
+    margin:0;
+    font-family:system-ui,Arial;
+    background:#111;
+    color:#eee;
+    padding:20px;
+  }
+
+  @media(prefers-color-scheme:light){
+    body{background:#f4f4f4;color:#111;}
+    .section{background:#fff;}
+  }
+
+  .wrap{
+    max-width:1000px;
+    margin:auto;
+  }
+
+  h1{
+    font-size:1.8rem;
+    margin-bottom:20px;
+    font-weight:700;
+  }
+
+  .section{
+    background:#1a1a1a;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+    border:1px solid #333;
+  }
+
+  .lesson-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .gif{
+    width:90px;
+    height:90px;
+    border-radius:10px;
+    overflow:hidden;
+    background:#222;
+    margin-right:16px;
+    border:1px solid #444;
+  }
+
+  .gif img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+
+  .title{
+    font-size:1.2rem;
+    font-weight:700;
+  }
+
+  .short-desc{
+    font-size:0.9rem;
+    color:#bbb;
+    margin-top:3px;
+    max-width:400px;
+  }
+
+  button{
+    padding:8px 12px;
+    border-radius:6px;
+    background:#333;
+    color:white;
+    border:1px solid #555;
+    cursor:pointer;
+  }
+
+  button.primary{
+    background:#0a7bff;
+    border:none;
+  }
+
+  .content{
+    overflow:hidden;
+    max-height:0;
+    opacity:0;
+    transition:max-height .35s ease, opacity .3s ease;
+    margin-top:14px;
+  }
+
+  .content.open{
+    max-height:8000px;
+    opacity:1;
+  }
+
+  .quiz{
+    background:#0f0f0f;
+    padding:14px;
+    border-radius:8px;
+    margin-top:16px;
+    border:1px solid #444;
+  }
+
+  .quiz input{
+    width:100%;
+    padding:10px;
+    border-radius:6px;
+    border:1px solid #666;
+    background:#222;
+    color:white;
+    margin-top:10px;
+  }
+
+  .lesson-submit{
+    margin-top:14px;
+    display:flex;
+    justify-content:flex-end;
+  }
+
+  p{
+    line-height:1.55;
+    margin-bottom:12px;
+  }
+
+  ul{
+    margin-left:22px;
+    line-height:1.55;
+  }
+
+  h2{
+    margin-top:20px;
+    font-size:1.25rem;
+  }
+  
+
+}
+.lesson img {
+    width: 100%;
+    aspect-ratio: 16 / 6;   /* ultra-wide rectangle */
+    object-fit: cover;
+    height: auto !important;
+    max-height: none !important;
+    border-radius: 6px;
+    display: block;
+}
+/* Dark mode (default) */
+body.dark {
+  background: #111;
+  color: #eee;
+}
+.section.dark {
+  background: #1a1a1a;
+  border: 1px solid #333;
+}
+
+/* Light mode */
+body.light {
+  background: #f4f4f4;
+  color: #111;
+}
+.section.light {
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+/* Make input, quiz boxes match theme */
+input, .quiz {
+  transition: all 0.3s;
+}
+
+body.dark input, body.dark .quiz {
+  background: #222;
+  color: #eee;
+  border: 1px solid #555;
+}
+
+body.light input, body.light .quiz {
+  background: #fff;
+  color: #111;
+  border: 1px solid #ccc;
+}
+:root {
+  --bg: #ffffff;
+  --box: #f2f2f2;
+  --text: #111;
+  --accent: #2b7a3d;
+  --hpPlant: #4caf50;
+  --hpZombie: #d13636;
+}
+
+.dark {
+  --bg: #0d0d0d;
+  --box: #1a1a1a;
+  --text: #ffffff;
+  --accent: #3ccf5f;
+}
+
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<h1>Science Quarter 1</h1>
+<button id="theme-toggle" class="primary" style="
+  width:40px; 
+  height:40px; 
+  padding:0; 
+  border-radius:10px; 
+  border:1px solid #333; 
+  background:#1a1a1a; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center;
+  margin-bottom:16px;
+">
+  <!-- Crescent moon by default -->
+  <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px">
+    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+  </svg>
+</button>
+
+<div id="progress-container">
+  <div id="progress-bar"></div>
+  <span id="progress-text">0%</span>
+</div>
+<!-- LESSON 1 -->
+<div class="section">  
+    <div class="lesson-head">  
+      <div style="display:flex; flex-direction:column; gap:4px;">  
+        <div style="display:flex; gap:12px; align-items:center;">  <div class="gif">  
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVAJw7nw1KmKvyMG-Tdyk4Ca51r7qJiNQfKBWHlP_14CUPqFhHtUQwFdM&s=10">  
+      </div>  
+
+      <div class="title">Lesson 1: The Digestive System</div>  
+    </div>  
+    <div class="short-desc">Functions, enzymes, and the full digestion pathway.</div>  
+  </div>  
+  <button class="toggle">Open</button>  
+</div>  
+
+<div class="content">  
+    <h2>General Overview</h2>
+    <p>
+      The digestive system is responsible for converting large, complex food molecules into smaller substances that 
+      the body can absorb and utilize. This process involves both mechanical digestion, which physically breaks down 
+      food through actions such as chewing and churning, and chemical digestion, which uses enzymes and acids to 
+      decompose complex molecules like carbohydrates, proteins, and fats into simpler forms. Digestion begins in the 
+      mouth and continues through a long pathway involving several organs, each with specific functions that contribute 
+      to the efficient breakdown and absorption of nutrients.
+    </p>
+
+    <h2>Major Organs and Their Functions</h2>
+    <ul>
+      <li>
+        Mouth – Responsible for the initial breakdown of food. Teeth perform mechanical digestion by chewing, 
+        while salivary glands secrete saliva containing salivary amylase, an enzyme that begins the chemical breakdown 
+        of carbohydrates. The tongue helps move food toward the esophagus.
+      </li>
+      <li>
+        Esophagus – A muscular tube that transports swallowed food from the mouth to the stomach. Movement is achieved 
+        through peristalsis, a series of wave-like muscle contractions.
+      </li>
+      <li>
+        Stomach – A muscular sac that churns food and mixes it with gastric juices containing hydrochloric acid and 
+        the enzyme pepsin. These substances initiate the chemical digestion of proteins. The stomach also produces mucus 
+        to protect its lining from acid damage.
+      </li>
+      <li>
+        Liver – Produces bile, a substance essential for emulsifying fats into smaller droplets, making them easier 
+        for enzymes to digest. The liver also detoxifies harmful substances and stores nutrients such as glycogen.
+      </li>
+      <li>
+        Gallbladder – Stores and concentrates bile produced by the liver. Releases bile into the small intestine when needed.
+      </li>
+      <li>
+        Pancreas – Produces digestive enzymes such as lipase (for fats), trypsin (for proteins), and pancreatic amylase 
+        (for carbohydrates). It also secretes bicarbonate to neutralize stomach acid entering the small intestine.
+      </li>
+      <li>
+        Small Intestine – The primary site of nutrient absorption. Contains villi and microvilli that increase surface area, 
+        allowing efficient absorption of amino acids, fatty acids, glucose, vitamins, and minerals.
+      </li>
+      <li>
+        Large Intestine – Absorbs water and electrolytes from undigested food, forming solid feces. Houses beneficial bacteria 
+        that produce vitamins such as vitamin K.
+      </li>
+    </ul>
+
+    <h2>Digestive Enzymes</h2>
+    <p>Below is a list of the major enzymes involved in digestion and the substrates they act on:</p>
+
+    <ul>
+      <li>Salivary Amylase – Converts starch into maltose in the mouth.</li>
+      <li>Pepsin – Breaks down proteins into peptides in the stomach.</li>
+      <li>Lipase – Converts fats into fatty acids and glycerol in the small intestine.</li>
+      <li>Trypsin – Further digests proteins in the small intestine.</li>
+      <li>Maltase, Sucrase, Lactase – Convert disaccharides into monosaccharides.</li>
+    </ul>
+
+    <h2>Digestive Disorders</h2>
+    <ul>
+      <li>Ulcer – A sore in the stomach lining caused by acid or bacterial infection.</li>
+      <li>Gastroesophageal Reflux Disease – Stomach acid flows back into the esophagus.</li>
+      <li>Constipation – Difficulty passing stool due to lack of fiber or dehydration.</li>
+      <li>Diarrhea – Loose stool caused by infection or rapid movement of food.</li>
+      <li>Lactose Intolerance – Inability to digest lactose due to lack of lactase enzyme.</li>
+    </ul>
+
+    <div class="quiz">
+      <p><b>Quiz:</b> Which organ is responsible for MOST nutrient absorption?</p>
+      <input type="text">
+    </div>
+
+    <div class="lesson-submit">
+      <button class="primary">Submit</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- LESSON 2 -->
+<div class="section">
+  <div class="lesson-head">
+    <div style="display:flex;">
+      <div class="gif">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR70narg8_iamuqvGZlKwKPXEp5i-Axe0GRAS8nORUEwmG30ufGuJXqINc&s=10">
+      </div>
+
+      <div>
+        <div class="title">Lesson 2: Plant Transport System </div>
+        <div class="short-desc">
+          Full explanation of xylem, phloem, transpiration, capillary action, root pressure, and transport mechanisms.
+        </div>
+      </div>
+    </div>
+    <button class="toggle">Open</button>
+  </div>
+
+  <div class="content">
+
+    <h2>Overview</h2>
+    <p>
+      Plants have a complex internal transport system that moves water, minerals, and food to all parts of the organism. 
+      Since plants lack a circulatory system similar to animals, they rely on specialized tissues and physical forces to 
+      achieve movement of substances. The two primary transport tissues are the xylem and phloem. Xylem transports water 
+      and minerals from the roots upward to the leaves, while phloem transports dissolved sugars and nutrients produced 
+      during photosynthesis to different parts of the plant. These processes are essential for growth, survival, and reproduction.
+    </p>
+
+    <h2>Xylem Structure and Function</h2>
+    <p>
+      Xylem tissue consists mostly of dead, hollow cells that form long tubes. Their walls are reinforced with lignin, a tough 
+      substance that helps the plant remain upright. Since the xylem cells are hollow and lack internal contents, water moves 
+      easily through them. The movement of water through the xylem is primarily upward, traveling from the roots to the stems 
+      and leaves.
+    </p>
+
+    <h2>Phloem Structure and Function</h2>
+    <p>
+      Phloem tissue consists of living cells, including sieve tube elements and companion cells. These cells transport sugars 
+      produced through photosynthesis in the leaves to other growing or storage regions in the plant. Unlike xylem, which 
+      operates in one direction, phloem transport is bidirectional, meaning food can move up or down depending on where it 
+      is needed.
+    </p>
+
+    <h2>Mechanisms of Water Movement</h2>
+    <ul>
+      <li>
+        Root Pressure – Water absorption at the roots creates pressure that pushes water upward through the xylem. 
+        This is most noticeable at night when transpiration is low.
+      </li>
+      <li>
+        Capillary Action – Water molecules adhere to the walls of the xylem and cohere to each other, helping them climb upward.
+      </li>
+      <li>
+        Transpiration Pull – The strongest force in water transport. When water evaporates from leaves, it creates a 
+        suction force that pulls water upward from the roots.
+      </li>
+    </ul>
+
+    <h2>Importance of Transpiration</h2>
+    <p>
+      Transpiration cools the plant, maintains water flow, transports minerals, and helps maintain the structure of plant cells. 
+      Without transpiration, plants would wilt and lose the ability to transport essential nutrients.
+    </p>
+
+    <div class="quiz">
+      <p><b>Quiz:</b> Which transport tissue is responsible for transporting sugars?</p>
+      <input type="text">
+    </div>
+
+    <div class="lesson-submit">
+      <button class="primary">Submit</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- LESSON 3 -->
+<div class="section">
+  <div class="lesson-head">
+    <div style="display:flex;">
+      <div class="gif">
+        <img src="https://thumbs.dreamstime.com/b/pea-plant-20128971.jpg">
+      </div>
+
+      <div>
+        <div class="title">Lesson 3: Mendelian Genetics</div>
+        <div class="short-desc">Complete discussion of alleles, genotypes, Punnett squares, Mendel's laws, and patterns of inheritance.</div>
+      </div>
+    </div>
+    <button class="toggle">Open</button>
+  </div>
+
+  <div class="content">
+
+    <h2>Introduction</h2>
+    <p>
+      Mendelian genetics is the foundation of modern hereditary science. Gregor Mendel, an Austrian monk, conducted 
+      experiments on pea plants in the 1800s. Through his work, he discovered patterns in how traits are passed down 
+      from parents to offspring. His findings established what are now known as Mendel's Laws of Inheritance. These laws 
+      explain how traits remain consistent across generations and why certain traits may appear or disappear. The core idea 
+      of Mendelian genetics is that traits are controlled by genes, which exist in different forms called alleles.
+    </p>
+
+    <h2>Key Terms</h2>
+    <ul>
+      <li>
+        Gene – A unit of heredity that encodes a trait. Each gene occupies a specific location (locus) on a chromosome.
+      </li>
+      <li>
+        Allele – A variation or form of a gene. For example, alleles may code for different flower colors.
+      </li>
+      <li>
+        Genotype – The genetic makeup of an organism, represented by allele combinations such as TT, Tt, or tt.
+      </li>
+      <li>
+        Phenotype – The physical expression of a genotype, such as tall or short plants.
+      </li>
+      <li>
+        Homozygous – Having identical alleles for a trait (TT or tt).
+      </li>
+      <li>
+        Heterozygous – Having different alleles for a trait (Tt).
+      </li>
+      <li>
+        Dominant – An allele that expresses itself even if only one copy is present.
+      </li>
+      <li>
+        Recessive – An allele that expresses itself only if two copies are present.
+      </li>
+    </ul>
+
+    <h2>Mendel's Laws</h2>
+    <h3>Law of Dominance</h3>
+    <p>
+      Some alleles are dominant while others are recessive. Dominant alleles mask recessive alleles in a heterozygous pair. 
+      For example, in tall (T) versus short (t) plants, T is dominant. Thus, both TT and Tt genotypes produce tall plants.
+    </p>
+
+    <h3>Law of Segregation</h3>
+    <p>
+      During the formation of gametes (egg or sperm cells), allele pairs separate. As a result, each gamete contains only 
+      one allele for each gene. This explains why offspring can inherit recessive traits even if the parent does not show them.
+    </p>
+
+    <h3>Law of Independent Assortment</h3>
+    <p>
+      Genes for different traits are inherited independently of one another, provided they are located on different chromosomes. 
+      This leads to genetic variation among offspring.
+    </p>
+
+    <h2>Punnett Squares</h2>
+    <p>
+      Punnett squares visually represent genetic crosses. They help predict possible genotypes and phenotypes of offspring. 
+      For example, crossing Tt with tt produces a 50 percent chance of short plants and a 50 percent chance of tall plants.
+    </p>
+
+    <div class="quiz">
+      <p><b>Quiz:</b> What term describes the physical expression of a gene?</p>
+      <input type="text">
+    </div>
+
+    <div class="lesson-submit">
+      <button class="primary">Submit</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- LESSON 4 -->
+<div class="section">
+  <div class="lesson-head">
+    <div style="display:flex;">
+      <div class="gif">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7TdErR6yumRs_mOQEvMS9yiR9cXCHQNFL_7NJ5UuiboRUi0cc2FqvBR1N&s=10">
+      </div>
+
+      <div>
+        <div class="title">Lesson 4: Water, Oxygen, and Carbon Cycles</div>
+        <div class="short-desc">In-depth explanation of biogeochemical cycles and their importance to ecosystems.</div>
+      </div>
+    </div>
+    <button class="toggle">Open</button>
+  </div>
+
+  <div class="content">
+
+    <h2>Water Cycle</h2>
+    <p>
+      The water cycle describes the continuous movement of water on, above, and below the surface of the Earth. 
+      Water evaporates from oceans, lakes, and rivers due to heat from the sun. The vapor rises into the atmosphere, 
+      where it cools and condenses into clouds. Eventually, water falls back to the surface as precipitation in the form 
+      of rain, snow, sleet, or hail. Some of this water infiltrates the ground and becomes groundwater, while the rest 
+      runs off into bodies of water. Plants also contribute through transpiration, releasing water vapor from their leaves.
+    </p>
+
+    <h2>Carbon Cycle</h2>
+    <p>
+      The carbon cycle involves the exchange of carbon among the atmosphere, oceans, soil, plants, and animals. 
+      Plants absorb carbon dioxide during photosynthesis and convert it into glucose. Animals then consume these plants 
+      and use the carbon for energy and growth. Through respiration, carbon dioxide is released back into the atmosphere. 
+      When organisms die, decomposers break them down, returning carbon to the soil. Carbon is also released through the 
+      burning of fossil fuels.
+    </p>
+
+    <h2>Oxygen Cycle</h2>
+    <p>
+      The oxygen cycle is closely related to the carbon cycle. Oxygen is released into the atmosphere by plants during 
+      photosynthesis. Animals and humans consume this oxygen during respiration and release carbon dioxide, which plants 
+      need for photosynthesis. This continuous exchange maintains balanced oxygen and carbon dioxide levels.
+    </p>
+
+    <div class="quiz">
+      <p><b>Quiz:</b> What process releases carbon dioxide into the atmosphere?</p>
+      <input type="text">
+    </div>
+
+    <div class="lesson-submit">
+      <button class="primary">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- LESSON 5 -->
+<div class="section">
+  <div class="lesson-head">
+    <div style="display:flex;">
+      <div class="gif">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT0xSBfx3MtLfMFCH0jFhYuJWf-FtbwBdas_7V7TIFSA&s=10">
+      </div>
+
+      <div>
+        <div class="title">Lesson 5: Photosynthesis</div>
+        <div class="short-desc">
+          Full explanation of the photosynthesis equation, chloroplast parts, light-dependent reactions, and Calvin cycle.
+        </div>
+      </div>
+    </div>
+    <button class="toggle">Open</button>
+  </div>
+
+  <div class="content">
+
+    <h2>Overview</h2>
+    <p>
+      Photosynthesis is a chemical process used by plants, algae, and some bacteria to convert light energy from the sun into
+      chemical energy stored in glucose. This process does not simply produce food for the plant; it also releases oxygen into
+      the atmosphere, making it vital for the survival of nearly all living things. Photosynthesis occurs in chloroplasts,
+      specialized organelles found mostly in the cells of plant leaves.
+    </p>
+
+    <h2>Photosynthesis Equation (Balanced)</h2>
+    <p>
+      Carbon dioxide + Water + Light → Glucose + Oxygen  
+      6 CO₂ + 6 H₂O + Light → C₆H₁₂O₆ + 6 O₂  
+      This equation represents the conversion of inorganic molecules (CO₂ and H₂O) into an organic molecule (glucose).
+    </p>
+
+    <h2>Chloroplast Structure</h2>
+    <ul>
+      <li>
+        Thylakoids – Flattened membrane sacs containing chlorophyll, the pigment responsible for absorbing sunlight.
+      </li>
+      <li>
+        Grana – Stacks of thylakoids that increase the surface area for light absorption.
+      </li>
+      <li>
+        Stroma – Fluid-filled space where the Calvin cycle occurs.
+      </li>
+      <li>
+        Chlorophyll – The green pigment that captures light energy.
+      </li>
+    </ul>
+
+    <h2>Stage 1: Light-Dependent Reactions</h2>
+    <p>
+      These reactions occur in the thylakoid membranes and require direct sunlight. The main purpose is to convert light energy
+      into ATP and NADPH, which are energy
